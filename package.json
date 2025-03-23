@@ -1,0 +1,37 @@
+{
+  "name": "encode-zkml",
+  "version": "1.0.0",
+  "description": "## Setup",
+  "scripts": {
+    "generate-proof": "cd ezkl && ~/.ezkl/ezkl prove -M network.compiled --pk-path=./proving.pk",
+    "verify-proof": "cd ezkl && ~/.ezkl/ezkl verify --vk-path=vk.vk",
+    "generate-emv-verifier": "cd ezkl && ~/.ezkl/ezkl create-evm-verifier --vk-path=vk.vk --sol-code-path=../contracts/verifier.sol --abi-path=../contracts/verifier_abi.json",
+    "clean": "hardhat clean",
+    "build": "hardhat compile",
+    "test": "hardhat test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nazarhussain/encode-zk-bootcamp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nazarhussain/encode-zk-bootcamp/issues"
+  },
+  "homepage": "https://github.com/nazarhussain/encode-zk-bootcamp#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/mocha": "^10.0.10",
+    "chai": "^4.2.0",
+    "hardhat": "^2.22.19",
+    "typechain": "^8.3.2"
+  },
+  "typechain": {
+    "target": "ethers-v6"
+  }
+}
