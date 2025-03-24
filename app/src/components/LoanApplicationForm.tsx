@@ -220,7 +220,7 @@ const LoanApplicationForm = ({
       <button
         type="submit"
         disabled={isDisabled}
-        className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white 
+        className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-black 
           ${isDisabled ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}
       >
         Submit Application
