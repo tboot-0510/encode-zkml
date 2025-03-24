@@ -9,26 +9,30 @@ async function generateProof() {
     console.log('#                LOADING REQUIRED FILES                #');
     console.log('########################################################');
 
-    console.time('Loading settings');
     const settingsPath = path.join(baseEzklPath, 'settings.json');
+    console.log(`Loading settings at path: ${settingsPath}`);
+    console.time('Loading settings');
     if (!fs.existsSync(settingsPath)) throw new Error('Setting file not found. You might need to run `ezkl gen-settings` to generate setting from your model')
     const settings = fs.readFileSync(settingsPath);
     console.timeEnd('Loading settings');
 
-    console.time('Loading model');
     const modelPath = path.join(baseEzklPath, 'network.compiled');
+    console.log(`Loading model at path: ${modelPath}`);
+    console.time('Loading model');
     if (!fs.existsSync(modelPath)) throw new Error('Compiled model not found. You might need to run `ezkl compile-circuit` to compile your ONNX model into a circuit')
     const model = fs.readFileSync(modelPath);
     console.timeEnd('Loading model');
 
-    console.time('Loading input');
     const inputPath = path.join(baseEzklPath, 'input.json');
+    console.log(`Loading input at path: ${inputPath}`);
+    console.time('Loading input');
     if (!fs.existsSync(inputPath)) throw new Error('Witness input not found. You might need to run `ezkl gen-witness` to generate your witness for proof generation')
     const input =  fs.readFileSync(inputPath);
     console.timeEnd('Loading input');
 
+    const kzgPath = path.join(baseEzklPath, 'kzg14.srs');
+    console.log(`Loading kzg srs at path: ${kzgPath}`);
     console.time('Loading kzg srs');
-    const kzgPath = path.join(baseEzklPath, 'kzg18.srs');
     if (!fs.existsSync(kzgPath)) throw new Error('SRS kzg commitment not found. You might need to download it with `ezkl get-srs` command');
     const kzg =  fs.readFileSync(kzgPath);
     console.timeEnd('Loading kzg srs');
@@ -37,6 +41,7 @@ async function generateProof() {
     console.log('#                LOADING PROVER KEY                    #');
     console.log('########################################################');
     const pkPath = path.join(baseEzklPath, 'pk.key');
+    console.log(`Loading prover key at path: ${pkPath}`);
     if (!fs.existsSync(pkPath)) throw new Error('Prover key not found. You might need to set it up with `ezkl setup` command');
     console.log('Checking memory usage before loading prover key');
     const memoryUsage = process.memoryUsage();
@@ -45,7 +50,7 @@ async function generateProof() {
     console.log(`Heap Used: ${memoryUsage.heapUsed / (1024 * 1024)} MB`);
     console.log(`External: ${memoryUsage.external / (1024 * 1024)} MB`);
 
-    console.log('Loading prover key...');
+    
     console.time('Prover key loaded');
     const pk = await readLargeFile(pkPath);
     console.timeEnd('Prover key loaded');
@@ -62,8 +67,25 @@ async function generateProof() {
 
     console.log('Generating proof...');
     console.time('Proof generated');
-    const result = await ezkl.prove(witness, pk, model, kzg);
+    const proof = await ezkl.prove(witness, pk, model, kzg);
     console.timeEnd('Proof generated');
+
+
+    console.log('\n\n########################################################');
+    console.log('#                  VERIFYING PROOF                     #');
+    console.log('########################################################');
+  
+    const vkPath = path.join(baseEzklPath, 'vk.key');
+    console.log(`Loading verifier key at path: ${vkPath}`);
+    console.time('Verifier key loaded');
+    const vk = await readLargeFile(vkPath);
+    console.timeEnd('Verifier key loaded');
+
+    console.log('Verifying proof...');
+    console.time('Proof verified');
+    await ezkl.verify(proof, vk, settings, kzg);
+    console.timeEnd('Proof verified');
+    return proof;
 }
 
 function readLargeFile(filePath) {
