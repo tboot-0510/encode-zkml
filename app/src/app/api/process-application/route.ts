@@ -2,9 +2,13 @@
 import { NextResponse } from "next/server";
 import fs from 'fs'; 
 import path from 'path';
-import ezkl from '@ezkljs/engine';
 
-const baseEzklPath = path.join(__dirname, '../../../ezkl');
+// Using default import loads web version which requires WASM initialization which has some issues
+// nodejs version instead is functional but import fails due to Nextjs not including dependency to wasm file in the build folder
+// import * as ezkl from '@ezkljs/engine/nodejs'
+import * as ezkl from '@ezkljs/engine'
+
+const baseEzklPath = path.join(__dirname, '../../../../../../ezkl');
 
 async function generateProof() {
     console.log('########################################################');
