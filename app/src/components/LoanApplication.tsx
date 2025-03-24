@@ -1,19 +1,12 @@
 "use client";
 import { useState } from "react";
-import WalletConnect from "./WalletConnect";
 import LoanApplicationForm from "./LoanApplicationForm";
-
+import { useWallet } from "@/context/WalletProvider";
 const LoanApplication = () => {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
-  const [applicationResult, setApplicationResult] = useState(null);
+  const { account } = useWallet();
+  const [applicationResult, setApplicationResult] = useState(null); // fix type here
 
-  const handleWalletConnect = (address) => {
-    setIsWalletConnected(true);
-    setWalletAddress(address);
-  };
-
-  const handleApplicationSubmit = async (formData) => {
+  const handleApplicationSubmit = async (formData: any) => {
     try {
       const response = await fetch("/api/process-application", {
         method: "POST",
@@ -21,13 +14,17 @@ const LoanApplication = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          walletAddress,
+          account,
           ...formData,
         }),
       });
 
       const result = await response.json();
-      setApplicationResult(result);
+      setApplicationResult({
+        ...result,
+        success: true,
+        message: "Application succesffully submitted",
+      });
     } catch (error) {
       console.error("Error processing application:", error);
       setApplicationResult({
@@ -43,7 +40,7 @@ const LoanApplication = () => {
 
       <LoanApplicationForm
         onSubmit={handleApplicationSubmit}
-        isWalletConnected={isWalletConnected}
+        isWalletConnected={!!account}
       />
 
       {applicationResult && (
@@ -51,6 +48,7 @@ const LoanApplication = () => {
           className={`mt-8 p-4 rounded ${
             applicationResult.success ? "bg-green-100" : "bg-red-100"
           }`}
+          onClick={() => setApplicationResult(null)}
         >
           <p className="text-center font-medium">{applicationResult.message}</p>
         </div>

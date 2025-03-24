@@ -4,6 +4,8 @@ export async function POST(request) {
   try {
     const data = await request.json();
 
+    console.log("data", data);
+
     // here do the ML prediction and generate the proof
 
     return NextResponse.json({ success: true });
