@@ -9,3 +9,8 @@ source venv/bin/activate
 pip install requirements.txt
 
 python3 main.py
+
+
+## Generate the pk.key
+
+yarn setup

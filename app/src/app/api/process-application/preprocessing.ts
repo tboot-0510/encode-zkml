@@ -1,5 +1,6 @@
 import path from "path";
 import * as fs from "fs/promises";
+import * as _fs from "fs";
 
 const min_scale_values = [
   12.24744871391589, 0.0, 3.0, 12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -48,10 +49,10 @@ export const initConfig = async () => {
   const kzgPath = path.join(baseEzklPath, "kzg14.srs");
   const pkPath = path.join(baseEzklPath, "pk.key");
 
-  // if (!fs.existsSync(settingsPath)) throw new Error("Settings file not found");
-  // if (!fs.existsSync(modelPath)) throw new Error("Model file not found");
-  // if (!fs.existsSync(kzgPath)) throw new Error("KZG file not found");
-  // if (!fs.existsSync(pkPath)) throw new Error("PK file not found");
+  if (!_fs.existsSync(settingsPath)) throw new Error("Settings file not found");
+  if (!_fs.existsSync(modelPath)) throw new Error("Model file not found");
+  if (!_fs.existsSync(kzgPath)) throw new Error("KZG file not found");
+  if (!_fs.existsSync(pkPath)) throw new Error("PK file not found");
 
   console.log("Loading config");
   const settings = await readFile(settingsPath);

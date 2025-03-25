@@ -1,8 +1,10 @@
 import { useState } from "react";
+import Spinner from "./Spinner";
 
 interface LoanApplicationFormProps {
   onSubmit: (formData: typeof initialFormData) => void;
   isWalletConnected: boolean;
+  loading: boolean;
 }
 
 const initialFormData = {
@@ -132,6 +134,7 @@ const formFields: FormField[] = [
 const LoanApplicationForm = ({
   onSubmit,
   isWalletConnected,
+  loading,
 }: LoanApplicationFormProps) => {
   const [formData, setFormData] = useState(initialFormData);
 
@@ -169,63 +172,76 @@ const LoanApplicationForm = ({
   const isDisabled = !isWalletConnected || !isFormValid(formData);
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8 space-y-6">
-      <div className="grid grid-cols-1 gap-6">
-        {formFields.map((field) => {
-          if (field.showIf && !field.showIf(formData)) return null;
+    <>
+      {loading && (
+        <div className="mt-6">
+          <Spinner />
+        </div>
+      )}
 
-          return (
-            <div key={field.name}>
-              <label className="block text-sm font-medium text-gray-700">
-                {field.label}
-              </label>
-              {field.type === "select" ? (
-                <select
-                  name={field.name}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  // required={
-                  //   typeof field.required === "function"
-                  //     ? field.required(formData)
-                  //     : field.required
-                  // }
-                >
-                  <option value="">Select...</option>
-                  {field.options?.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  // required={
-                  //   typeof field.required === "function"
-                  //     ? field.required(formData)
-                  //     : field.required
-                  // }
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {!loading && (
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-lg mx-auto mt-8 space-y-6"
+        >
+          <div className="grid grid-cols-1 gap-6">
+            {formFields.map((field) => {
+              if (field.showIf && !field.showIf(formData)) return null;
 
-      <button
-        type="submit"
-        // disabled={isDisabled}
-        className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-black 
+              return (
+                <div key={field.name}>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {field.label}
+                  </label>
+                  {field.type === "select" ? (
+                    <select
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required={
+                        typeof field.required === "function"
+                          ? field.required(formData)
+                          : field.required
+                      }
+                    >
+                      <option value="">Select...</option>
+                      {field.options?.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type}
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required={
+                        typeof field.required === "function"
+                          ? field.required(formData)
+                          : field.required
+                      }
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isDisabled}
+            className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-black 
           ${isDisabled ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}
-      >
-        Submit Application
-      </button>
-    </form>
+          >
+            {loading ? "generating proof..." : "Submit Application"}
+          </button>
+        </form>
+      )}
+    </>
   );
 };
 
