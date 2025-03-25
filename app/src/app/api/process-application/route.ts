@@ -1,30 +1,13 @@
 import { NextResponse } from "next/server";
 import * as ezkl from "@ezkljs/engine/nodejs";
-import { initConfig, normalizeFormData } from "./proof";
+import { initConfig, normalizeFormData } from "./preprocessing";
 import { predict } from "./predict";
 
-const config = await initConfig(); // comment this out to avoid loading the config
+const config = await initConfig();
 
 export async function POST(request: Request) {
   try {
-    // const data = await request.json();
-
-    const data = {
-      account: "0x8b22897ABc3f204263c9eB76Dc166F52e2F01b40",
-      gender: "Male",
-      married: "No",
-      dependents: "1",
-      education: "Graduate",
-      selfEmployed: "Yes",
-      applicantIncome: "290909",
-      coapplicantIncome: "",
-      loanAmount: "2334",
-      loanTerm: "11",
-      creditHistory: "1",
-      propertyArea: "Semiurban",
-    };
-
-    const { model, kzg, pk } = config;
+    const data = await request.json();
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { account, ...formData } = data;
@@ -32,41 +15,49 @@ export async function POST(request: Request) {
     const normalizedInput = normalizeFormData(formData);
     console.log("Predicting...");
     const modelPrediction = await predict(normalizedInput);
-    console.log("Model prediction", modelPrediction);
+    console.log("Predicting... done");
 
     const inputs = {
       input_shapes: [[16]], // to prove the correctness of the numbers of the inputs
       input_data: [normalizedInput], // inputs collected from the web form (private)
-      output_data: [modelPrediction], // results of the model output (public)
+      output_data: [[Number(modelPrediction[0])]], // results of the model output (public)
     };
 
     // generate the proof
     try {
       ezkl.init_panic_hook();
       const serializedInputs = ezkl.serialize(inputs);
-      console.log("serializedInputs", model);
-      const witness = ezkl.genWitness(model, serializedInputs);
-      console.log("witness", witness);
-
+      const witness = ezkl.genWitness(config.model, serializedInputs);
       const witness_ser = new Uint8ClampedArray(witness.buffer);
-      console.log("witness_ser", witness_ser);
 
+      console.log("Generating proof...");
       const proof = ezkl.prove(
         witness_ser,
-        new Uint8ClampedArray(pk),
-        new Uint8ClampedArray(model),
-        new Uint8ClampedArray(kzg)
+        new Uint8ClampedArray(config.pk),
+        new Uint8ClampedArray(config.model),
+        new Uint8ClampedArray(config.kzg)
       );
+      console.log("Generating proof done");
 
       console.log("proof", proof);
+      // TODO: send a blockchain transaction to the contract
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          proof,
+          model_prediction: Number(modelPrediction[0]),
+        },
+      });
     } catch (error) {
       console.error("Error generating witness", error);
     }
-
-    return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: error.message },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

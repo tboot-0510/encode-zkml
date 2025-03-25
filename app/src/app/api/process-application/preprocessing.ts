@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import path from "path";
 import * as fs from "fs/promises";
 
@@ -33,37 +32,13 @@ const convertStringToNumber = (value: string) => {
   return categoryMappings[value] ?? Number(value);
 };
 
-function readLargeFile(filePath: string) {
-  return new Promise((resolve, reject) => {
-    const chunks: any[] = []; // This will hold the full file content as a string
-
-    const readStream = fs.createReadStream(filePath, {
-      highWaterMark: 1024 * 1024,
-    }); // 1MB chunks
-
-    readStream.on("data", (chunk) => {
-      chunks.push(chunk); // Append each chunk to the `data` variable
-    });
-
-    readStream.on("end", () => {
-      const data = Buffer.concat(chunks);
-      resolve(data); // Resolve the promise with the full file content
-    });
-
-    readStream.on("error", (err) => {
-      reject(err); // Reject the promise if an error occurs
-    });
-  });
-}
-
 const minMaxScale = (value: number, min: number, max: number) => {
   return (value - min) / (max - min);
 };
 
 const readFile = async (filePath: string) => {
   const buffer = await fs.readFile(filePath);
-  // return new Uint8ClampedArray(buffer.buffer);
-  return buffer;
+  return new Uint8ClampedArray(buffer.buffer);
 };
 
 export const initConfig = async () => {
@@ -72,7 +47,6 @@ export const initConfig = async () => {
   const modelPath = path.join(baseEzklPath, "network.compiled");
   const kzgPath = path.join(baseEzklPath, "kzg14.srs");
   const pkPath = path.join(baseEzklPath, "pk.key");
-  const inputPath = path.join(baseEzklPath, "input.json");
 
   // if (!fs.existsSync(settingsPath)) throw new Error("Settings file not found");
   // if (!fs.existsSync(modelPath)) throw new Error("Model file not found");
@@ -84,13 +58,13 @@ export const initConfig = async () => {
   const model = await readFile(modelPath);
   const kzg = await readFile(kzgPath);
   const pk = await readFile(pkPath);
-  const input = await readFile(inputPath);
 
   console.log("Config loaded");
 
-  return { settings, model, kzg, pk, input };
+  return { settings, model, kzg, pk };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const normalizeFormData = (formData: any) => {
   const normalizedData = {
     gender: convertStringToNumber(formData.gender),
