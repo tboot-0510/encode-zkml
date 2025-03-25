@@ -185,11 +185,11 @@ const LoanApplicationForm = ({
                   value={formData[field.name]}
                   onChange={handleChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  required={
-                    typeof field.required === "function"
-                      ? field.required(formData)
-                      : field.required
-                  }
+                  // required={
+                  //   typeof field.required === "function"
+                  //     ? field.required(formData)
+                  //     : field.required
+                  // }
                 >
                   <option value="">Select...</option>
                   {field.options?.map((option) => (
@@ -205,11 +205,11 @@ const LoanApplicationForm = ({
                   value={formData[field.name]}
                   onChange={handleChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  required={
-                    typeof field.required === "function"
-                      ? field.required(formData)
-                      : field.required
-                  }
+                  // required={
+                  //   typeof field.required === "function"
+                  //     ? field.required(formData)
+                  //     : field.required
+                  // }
                 />
               )}
             </div>
@@ -219,7 +219,7 @@ const LoanApplicationForm = ({
 
       <button
         type="submit"
-        disabled={isDisabled}
+        // disabled={isDisabled}
         className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-black 
           ${isDisabled ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"}`}
       >

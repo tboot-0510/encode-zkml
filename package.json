@@ -6,6 +6,7 @@
     "generate-proof": "cd ezkl && ~/.ezkl/ezkl prove -M network.compiled --pk-path=./proving.pk",
     "verify-proof": "cd ezkl && ~/.ezkl/ezkl verify --vk-path=vk.vk",
     "generate-emv-verifier": "cd ezkl && ~/.ezkl/ezkl create-evm-verifier --vk-path=vk.vk --sol-code-path=../contracts/verifier.sol --abi-path=../contracts/verifier_abi.json",
+    "setup": "cd ezkl && ~/.ezkl/ezkl setup -M network.compiled --srs-path=kzg14.srs",
     "clean": "hardhat clean",
     "build": "hardhat compile",
     "test": "hardhat test"

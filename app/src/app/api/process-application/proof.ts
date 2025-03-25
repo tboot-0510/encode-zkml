@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import path from "path";
-import fs from "fs";
+import * as fs from "fs/promises";
 
 const min_scale_values = [
-  3.4996355115805833, 0.0, 1.7320508075688772, 12.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  12.24744871391589, 0.0, 3.0, 12.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+  0.0, 0.0, 0.0, 0.0,
 ];
 const max_scale_values = [
-  16.87023975571047, 14.287230722812572, 5.143686723610402, 480.0, 1.0, 1.0,
+  284.60498941515414, 204.12496172687946, 26.457513110645905, 480.0, 1.0, 1.0,
   1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 ];
 
@@ -60,26 +60,35 @@ const minMaxScale = (value: number, min: number, max: number) => {
   return (value - min) / (max - min);
 };
 
-export const initConfig = async () => {
-  const settingsPath = path.join(__dirname, "settings.json");
-  const modelPath = path.join(__dirname, "network.compiled");
-  const kzgPath = path.join(__dirname, "kzg14.srs");
-  const pkPath = path.join(__dirname, "pk.key");
+const readFile = async (filePath: string) => {
+  const buffer = await fs.readFile(filePath);
+  // return new Uint8ClampedArray(buffer.buffer);
+  return buffer;
+};
 
-  if (!fs.existsSync(settingsPath)) throw new Error("Settings file not found");
-  if (!fs.existsSync(modelPath)) throw new Error("Model file not found");
-  if (!fs.existsSync(kzgPath)) throw new Error("KZG file not found");
-  if (!fs.existsSync(pkPath)) throw new Error("PK file not found");
+export const initConfig = async () => {
+  const baseEzklPath = path.join(__dirname, "../../../../../../ezkl");
+  const settingsPath = path.join(baseEzklPath, "settings.json");
+  const modelPath = path.join(baseEzklPath, "network.compiled");
+  const kzgPath = path.join(baseEzklPath, "kzg14.srs");
+  const pkPath = path.join(baseEzklPath, "pk.key");
+  const inputPath = path.join(baseEzklPath, "input.json");
+
+  // if (!fs.existsSync(settingsPath)) throw new Error("Settings file not found");
+  // if (!fs.existsSync(modelPath)) throw new Error("Model file not found");
+  // if (!fs.existsSync(kzgPath)) throw new Error("KZG file not found");
+  // if (!fs.existsSync(pkPath)) throw new Error("PK file not found");
 
   console.log("Loading config");
-  const settings = fs.readFileSync(settingsPath, "utf8");
-  const model = fs.readFileSync(modelPath, "utf8");
-  const kzg = fs.readFileSync(kzgPath, "utf8");
-  const pk = await readLargeFile(pkPath);
+  const settings = await readFile(settingsPath);
+  const model = await readFile(modelPath);
+  const kzg = await readFile(kzgPath);
+  const pk = await readFile(pkPath);
+  const input = await readFile(inputPath);
 
   console.log("Config loaded");
 
-  return { settings, model, kzg, pk };
+  return { settings, model, kzg, pk, input };
 };
 
 export const normalizeFormData = (formData: any) => {
@@ -97,6 +106,13 @@ export const normalizeFormData = (formData: any) => {
     propertyArea: convertStringToNumber(formData.propertyArea),
   };
 
+  const dependentsEncoding = [
+    normalizedData.dependents === 0 ? 1 : 0, // Dependents_0
+    normalizedData.dependents === 1 ? 1 : 0, // Dependents_1
+    normalizedData.dependents === 2 ? 1 : 0, // Dependents_2
+    normalizedData.dependents === 3 ? 1 : 0, // Dependents_3+
+  ];
+
   const scaledData = [
     normalizedData.applicantIncome,
     normalizedData.coapplicantIncome,
@@ -105,7 +121,7 @@ export const normalizeFormData = (formData: any) => {
     normalizedData.creditHistory,
     normalizedData.gender,
     normalizedData.married,
-    normalizedData.dependents,
+    ...dependentsEncoding,
     normalizedData.education,
     normalizedData.selfEmployed,
     normalizedData.propertyArea === 0 ? 1 : 0, // Rural
