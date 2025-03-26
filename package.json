@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "## Setup",
   "scripts": {
-    "generate-proof": "cd ezkl && ~/.ezkl/ezkl prove -M network.compiled --pk-path=./proving.pk",
-    "verify-proof": "cd ezkl && ~/.ezkl/ezkl verify --vk-path=vk.vk",
-    "generate-emv-verifier": "cd ezkl && ~/.ezkl/ezkl create-evm-verifier --vk-path=vk.vk --sol-code-path=../contracts/verifier.sol --abi-path=../contracts/verifier_abi.json",
+    "ezkl:generate-proof": "cd ezkl && ~/.ezkl/ezkl prove -M network.compiled --pk-path=./proving.pk",
+    "ezkl:verify-proof": "cd ezkl && ~/.ezkl/ezkl verify --vk-path=vk.vk",
+    "ezkl:generate-emv-verifier": "cd ezkl && ~/.ezkl/ezkl create-evm-verifier --vk-path=vk.vk --sol-code-path=../contracts/verifier.sol --abi-path=../contracts/verifier_abi.json",
     "eth:clean": "hardhat clean",
     "eth:build": "hardhat compile",
     "eth:deploy": "hardhat ignition deploy ignition/modules/CreditScore.ts",
