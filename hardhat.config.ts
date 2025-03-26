@@ -1,7 +1,9 @@
+import "dotenv/config";
 import type { HardhatUserConfig } from "hardhat/config";
-import "@typechain/hardhat"
+import "@typechain/hardhat";
 import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
+import "@nomicfoundation/hardhat-ignition-ethers";
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -10,10 +12,17 @@ const config: HardhatUserConfig = {
       viaIR: false,
       optimizer: {
         enabled: true,
-        runs: 200
-      }
-    }
-  }
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    hardhat: {},
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
+  },
 };
 
 export default config;

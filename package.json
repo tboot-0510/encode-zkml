@@ -6,9 +6,10 @@
     "generate-proof": "cd ezkl && ~/.ezkl/ezkl prove -M network.compiled --pk-path=./proving.pk",
     "verify-proof": "cd ezkl && ~/.ezkl/ezkl verify --vk-path=vk.vk",
     "generate-emv-verifier": "cd ezkl && ~/.ezkl/ezkl create-evm-verifier --vk-path=vk.vk --sol-code-path=../contracts/verifier.sol --abi-path=../contracts/verifier_abi.json",
-    "clean": "hardhat clean",
-    "build": "hardhat compile",
-    "test": "hardhat test"
+    "eth:clean": "hardhat clean",
+    "eth:build": "hardhat compile",
+    "eth:deploy": "hardhat ignition deploy ignition/modules/CreditScore.ts",
+    "eth:test": "hardhat test"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.10",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "@types/mocha": "^10.0.10",
@@ -33,5 +35,8 @@
   },
   "typechain": {
     "target": "ethers-v6"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
   }
 }
