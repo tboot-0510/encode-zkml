@@ -30,13 +30,11 @@
     "@typechain/hardhat": "^9.1.0",
     "@types/mocha": "^10.0.10",
     "chai": "^4.2.0",
+    "dotenv": "^16.4.7",
     "hardhat": "^2.22.19",
     "typechain": "^8.3.2"
   },
   "typechain": {
     "target": "ethers-v6"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.7"
   }
 }
