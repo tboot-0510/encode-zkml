@@ -31,7 +31,7 @@ export const generateProof = async (
 
     // TODO: send a blockchain transaction to the contract
 
-    return proof;
+    return {proof, witness};
   } catch (error) {
     console.error("Error generating witness", error);
   }
