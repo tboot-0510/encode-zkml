@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const modelPrediction = await predict(normalizedInput);
     console.log("Predicting... done");
 
-    const proof = await generateProof(
+    const result = await generateProof(
       normalizedInput,
       Number(modelPrediction[0])
     );
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        proof,
+        proof: result?.proof?.toString(),
+        witness: result?.witness?.toString(),
         model_prediction: Number(modelPrediction[0]),
       },
     });

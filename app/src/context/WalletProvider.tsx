@@ -9,7 +9,7 @@ import {
   PublicClient,
   WalletClient,
 } from "viem";
-import { mainnet } from "viem/chains";
+import { sepolia } from "viem/chains";
 
 interface WalletContextType {
   account: `0x${string}` | null;
@@ -44,15 +44,46 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
+    const SEPOLIA_CHAIN_ID = "0xaa36a7";
+
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: SEPOLIA_CHAIN_ID }],
+      });
+    } catch (switchError: any) {
+      // This error code indicates that the chain has not been added to MetaMask
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: SEPOLIA_CHAIN_ID,
+              chainName: "Sepolia",
+              nativeCurrency: {
+                name: "Sepolia ETH",
+                symbol: "SEP",
+                decimals: 18,
+              },
+              rpcUrls: ["https://rpc.sepolia.org"],
+              blockExplorerUrls: ["https://sepolia.etherscan.io"],
+            },
+          ],
+        });
+      } else {
+        throw switchError;
+      }
+    }
+
     try {
       const publicClient = createPublicClient({
-        chain: mainnet,
+        chain: sepolia,
         transport: http(),
       });
       setPublicClient(publicClient);
 
       const walletClient = createWalletClient({
-        chain: mainnet,
+        chain: sepolia,
         transport: custom(window.ethereum),
       });
       setWalletClient(walletClient);
